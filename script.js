@@ -1,33 +1,11 @@
 function onDuplicateBoard(board) {
   const boardsContainer = document.querySelector(".boards");
-  const newBoard = structuredClone(board);
   const lastBoardId = boards[boards.length - 1].id;
-  newBoard.id = lastBoardId + 1;
-  newBoard.title = `${newBoard.title} Copy`;
+  const newBoard = new Board(lastBoardId + 1, `${board.title} Copy`, board.tasks);
 
   const boardContainer = getBoardView(newBoard);
   boardsContainer.appendChild(boardContainer);
   boards.push(newBoard);
-}
-
-function onBoardTitleClick(boardId) {
-  const newTitle = prompt("Novo titulo do board");
-  if (!newTitle) {
-    alert("Insira o novo título!");
-    return;
-  }
-
-  const boardTitleElement = document.querySelector(
-    `[data-board-id="${boardId}"] .board-title`
-  );
-  boardTitleElement.textContent = newTitle;
-}
-
-function onDeleteBoard(boardId) {
-  boards = boards.filter((board) => board.id !== boardId);
-
-  const boardContainer = document.querySelector(`[data-board-id="${boardId}"]`);
-  boardContainer.remove();
 }
 
 function onAddBoard(newBoardTitle) {
@@ -62,22 +40,10 @@ function onCompleteTask(boardId, taskId) {
   taskContainer.classList.toggle("completed");
 }
 
-function onAddTask(boardId, newTaskName) {
-  const board = boards.find((board) => board.id === Number(boardId));
-  const lastTaskId = board.tasks[board.tasks.length - 1]?.id || 0;
-  const task = new Task (lastTaskId + 1, newTaskName, false);
-  board.tasks.push(task);
-
-  const tasksContainer = document.querySelector(
-    `[data-board-id="${boardId}"] .tasks`
-  );
-  const taskContainer = getTaskView(Number(boardId), task);
-  tasksContainer.appendChild(taskContainer);
-}
-
 function handleNewTaskInputKeypress(e) {
+	const board = boards.find((board) => board.id === Number(e.target.dataset.boardId));
   if (e.key === "Enter") {
-    onAddTask(e.target.dataset.boardId, e.target.value);
+    board.onAddTask(e.target.value);
     e.target.value = "";
   }
 }
@@ -140,7 +106,7 @@ function getBoardView(board) {
   const deleteButton = document.createElement("button");
   deleteButton.classList.add("delete-button");
   deleteButton.textContent = "X";
-  deleteButton.addEventListener("click", () => onDeleteBoard(board.id));
+  deleteButton.addEventListener("click", () => board.onDeleteBoard());
   htmlRow.appendChild(deleteButton);
 
   boardContainer.appendChild(htmlRow);
@@ -148,7 +114,7 @@ function getBoardView(board) {
   const boardTitle = document.createElement("p");
   boardTitle.classList.add("board-title");
   boardTitle.textContent = board.title;
-  boardTitle.addEventListener("click", () => onBoardTitleClick(board.id));
+  boardTitle.addEventListener("click", () => board.onBoardTitleClick());
   boardContainer.appendChild(boardTitle);
 
   const tasksContainer = document.createElement("ul");
@@ -176,6 +142,38 @@ class Board {
 		this.id = id;
 		this.title = title;
 		this.tasks = tasks;
+	}
+
+	onDeleteBoard() {
+		boards = boards.filter((board) => board.id !== this.id);
+
+		const boardContainer = document.querySelector(`[data-board-id="${this.id}"]`);
+		boardContainer.remove();
+	}
+
+	onBoardTitleClick() {
+		const newTitle = prompt("Novo titulo do board");
+		if (!newTitle) {
+		  alert("Insira o novo título!");
+		  return;
+		}
+	  
+		const boardTitleElement = document.querySelector(
+		  `[data-board-id="${this.id}"] .board-title`
+		);
+		boardTitleElement.textContent = newTitle;
+	}
+
+	onAddTask(newTaskName) {
+		const lastTaskId = this.tasks[this.tasks.length - 1]?.id || 0;
+		const task = new Task (lastTaskId + 1, newTaskName, false);
+		this.tasks.push(task);
+
+		const tasksContainer = document.querySelector(
+			`[data-board-id="${this.id}"] .tasks`
+		);
+		const taskContainer = getTaskView(this.id, task);
+		tasksContainer.appendChild(taskContainer);
 	}
 }
 
