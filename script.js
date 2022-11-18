@@ -18,28 +18,6 @@ function onAddBoard(newBoardTitle) {
   boardsContainer.appendChild(boardContainer);
 }
 
-function onDeleteTask(boardId, taskId) {
-  const board = boards.find((board) => board.id === boardId);
-  board.tasks = board.tasks.filter((task) => task.id !== taskId);
-
-  const taskContainer = document.querySelector(
-    `[data-task-id="${taskId}"][data-board-id="${boardId}"]`
-  );
-  taskContainer.remove();
-}
-
-function onCompleteTask(boardId, taskId) {
-  const board = boards.find((board) => board.id === boardId);
-
-  const completedTask = board.tasks.find((task) => task.id === taskId);
-  completedTask.completed = !completedTask.completed;
-
-  const taskContainer = document.querySelector(
-    `[data-task-id="${taskId}"][data-board-id="${boardId}"]`
-  );
-  taskContainer.classList.toggle("completed");
-}
-
 function handleNewTaskInputKeypress(e) {
 	const board = boards.find((board) => board.id === Number(e.target.dataset.boardId));
   if (e.key === "Enter") {
@@ -70,7 +48,7 @@ function getTaskView(boardId, task) {
   taskCheckbox.type = "checkbox";
   taskCheckbox.checked = task.completed;
   taskCheckbox.addEventListener("click", () =>
-    onCompleteTask(boardId, task.id)
+    task.onCompleteTask(boardId)
   );
   taskContainer.appendChild(taskCheckbox);
 
@@ -83,7 +61,7 @@ function getTaskView(boardId, task) {
   const deleteButton = document.createElement("button");
   deleteButton.classList.add("delete-button");
   deleteButton.textContent = "X";
-  deleteButton.addEventListener("click", () => onDeleteTask(boardId, task.id));
+  deleteButton.addEventListener("click", () => task.onDeleteTask(boardId));
   taskContainer.appendChild(deleteButton);
 
   return taskContainer;
@@ -182,6 +160,28 @@ class Task {
 		this.id = id;
 		this.name = name;
 		this.completed = completed;
+	}
+
+	onCompleteTask(boardId) {
+		const board = boards.find((board) => board.id === boardId);
+
+		const completedTask = board.tasks.find((task) => task.id === this.id);
+		completedTask.completed = !completedTask.completed;
+	  
+		const taskContainer = document.querySelector(
+		  `[data-task-id="${this.id}"][data-board-id="${boardId}"]`
+		);
+		taskContainer.classList.toggle("completed");
+	}
+
+	onDeleteTask(boardId) {
+		const board = boards.find((board) => board.id === boardId);
+  		board.tasks = board.tasks.filter((task) => task.id !== this.id);
+
+		const taskContainer = document.querySelector(
+			`[data-task-id="${this.id}"][data-board-id="${boardId}"]`
+		);
+		taskContainer.remove();
 	}
 }
 const task1 = new Task(1, "tarefa 1", false);
