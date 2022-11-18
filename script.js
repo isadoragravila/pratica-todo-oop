@@ -18,7 +18,7 @@ function onBoardTitleClick(boardId) {
   }
 
   const boardTitleElement = document.querySelector(
-    `.board-${boardId} .board-title`
+    `[data-board-id="${boardId}"] .board-title`
   );
   boardTitleElement.textContent = newTitle;
 }
@@ -32,11 +32,7 @@ function onDeleteBoard(boardId) {
 
 function onAddBoard(newBoardTitle) {
   const lastBoardId = boards[boards.length - 1]?.id || 0;
-  const board = {
-    id: lastBoardId + 1,
-    title: newBoardTitle,
-    tasks: [],
-  };
+  const board = new Board (lastBoardId + 1, newBoardTitle, []);
   boards.push(board);
 
   const boardsContainer = document.querySelector(".boards");
@@ -68,12 +64,8 @@ function onCompleteTask(boardId, taskId) {
 
 function onAddTask(boardId, newTaskName) {
   const board = boards.find((board) => board.id === Number(boardId));
-  const lastTaskId = board.tasks[board.tasks.length - 1].id;
-  const task = {
-    id: lastTaskId + 1,
-    name: newTaskName,
-    completed: false,
-  };
+  const lastTaskId = board.tasks[board.tasks.length - 1]?.id || 0;
+  const task = new Task (lastTaskId + 1, newTaskName, false);
   board.tasks.push(task);
 
   const tasksContainer = document.querySelector(
@@ -179,17 +171,29 @@ function getBoardView(board) {
   return boardContainer;
 }
 
-const boardPessoal = {
-	id: 1,
-	title: "Title",
-	tasks: [
-	  { id: 1, name: "tarefa 1", completed: false },
-	  { id: 2, name: "tarefa 2", completed: false },
-	  { id: 3, name: "tarefa 3", completed: true },
-	  { id: 4, name: "tarefa 4", completed: false },
-	  { id: 5, name: "tarefa 5", completed: true },
-	],
-  };
+class Board {
+	constructor(id, title, tasks) {
+		this.id = id;
+		this.title = title;
+		this.tasks = tasks;
+	}
+}
+
+class Task {
+	constructor(id, name, completed) {
+		this.id = id;
+		this.name = name;
+		this.completed = completed;
+	}
+}
+const task1 = new Task(1, "tarefa 1", false);
+const task2 = new Task(2, "tarefa 2", false);
+const task3 = new Task(3, "tarefa 3", true);
+const task4 = new Task(4, "tarefa 4", false);
+const task5 = new Task(5, "tarefa 5", true);
+const tasks = [task1, task2, task3, task4, task5];
+
+const boardPessoal = new Board(1, "Title", tasks);
 
 let boards = [boardPessoal];
 
