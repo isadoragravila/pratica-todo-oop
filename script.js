@@ -1,68 +1,3 @@
-function onAddBoard(newBoardTitle) {
-	const lastBoardId = boards[boards.length - 1]?.id || 0;
-	const board = new Board(lastBoardId + 1, newBoardTitle, []);
-	boards.push(board);
-
-	const boardsContainer = document.querySelector(".boards");
-	const boardContainer = getBoardView(board);
-	boardsContainer.appendChild(boardContainer);
-}
-
-function handleNewBoardInputKeypress(e) {
-	if (e.key === "Enter") {
-		onAddBoard(e.target.value);
-		e.target.value = "";
-	}
-}
-
-function getBoardView(board) {
-	const boardContainer = document.createElement("div");
-	boardContainer.classList.add("board");
-	boardContainer.dataset.boardId = board.id;
-
-	const htmlRow = document.createElement("div");
-	htmlRow.classList.add("row");
-
-	const duplicateButton = document.createElement("button");
-	duplicateButton.classList.add("duplicate-button");
-	duplicateButton.textContent = "Duplicate board";
-	duplicateButton.addEventListener("click", () => board.onDuplicateBoard());
-	htmlRow.appendChild(duplicateButton);
-
-	const deleteButton = document.createElement("button");
-	deleteButton.classList.add("delete-button");
-	deleteButton.textContent = "X";
-	deleteButton.addEventListener("click", () => board.onDeleteBoard());
-	htmlRow.appendChild(deleteButton);
-
-	boardContainer.appendChild(htmlRow);
-
-	const boardTitle = document.createElement("p");
-	boardTitle.classList.add("board-title");
-	boardTitle.textContent = board.title;
-	boardTitle.addEventListener("click", () => board.onBoardTitleClick());
-	boardContainer.appendChild(boardTitle);
-
-	const tasksContainer = document.createElement("ul");
-	tasksContainer.classList.add("tasks");
-	boardContainer.appendChild(tasksContainer);
-
-	board.tasks.forEach((task) => {
-		const taskContainer = board.getTaskView(task);
-		tasksContainer.appendChild(taskContainer);
-	});
-
-	const newTaskInput = document.createElement("input");
-	newTaskInput.dataset.boardId = board.id;
-	newTaskInput.classList.add("new-task-input");
-	newTaskInput.type = "text";
-	newTaskInput.placeholder = "Nova tarefa";
-	newTaskInput.addEventListener("keypress", e => board.handleNewTaskInputKeypress(e));
-	boardContainer.appendChild(newTaskInput);
-
-	return boardContainer;
-}
-
 class Board {
 	constructor(id, title, tasks) {
 		this.id = id;
@@ -193,6 +128,71 @@ const tasks = [task1, task2, task3, task4, task5];
 const boardPessoal = new Board(1, "Title", tasks);
 
 let boards = [boardPessoal];
+
+function onAddBoard(newBoardTitle) {
+	const lastBoardId = boards[boards.length - 1]?.id || 0;
+	const board = new Board(lastBoardId + 1, newBoardTitle, []);
+	boards.push(board);
+
+	const boardsContainer = document.querySelector(".boards");
+	const boardContainer = getBoardView(board);
+	boardsContainer.appendChild(boardContainer);
+}
+
+function handleNewBoardInputKeypress(e) {
+	if (e.key === "Enter") {
+		onAddBoard(e.target.value);
+		e.target.value = "";
+	}
+}
+
+function getBoardView(board) {
+	const boardContainer = document.createElement("div");
+	boardContainer.classList.add("board");
+	boardContainer.dataset.boardId = board.id;
+
+	const htmlRow = document.createElement("div");
+	htmlRow.classList.add("row");
+
+	const duplicateButton = document.createElement("button");
+	duplicateButton.classList.add("duplicate-button");
+	duplicateButton.textContent = "Duplicate board";
+	duplicateButton.addEventListener("click", () => board.onDuplicateBoard());
+	htmlRow.appendChild(duplicateButton);
+
+	const deleteButton = document.createElement("button");
+	deleteButton.classList.add("delete-button");
+	deleteButton.textContent = "X";
+	deleteButton.addEventListener("click", () => board.onDeleteBoard());
+	htmlRow.appendChild(deleteButton);
+
+	boardContainer.appendChild(htmlRow);
+
+	const boardTitle = document.createElement("p");
+	boardTitle.classList.add("board-title");
+	boardTitle.textContent = board.title;
+	boardTitle.addEventListener("click", () => board.onBoardTitleClick());
+	boardContainer.appendChild(boardTitle);
+
+	const tasksContainer = document.createElement("ul");
+	tasksContainer.classList.add("tasks");
+	boardContainer.appendChild(tasksContainer);
+
+	board.tasks.forEach((task) => {
+		const taskContainer = board.getTaskView(task);
+		tasksContainer.appendChild(taskContainer);
+	});
+
+	const newTaskInput = document.createElement("input");
+	newTaskInput.dataset.boardId = board.id;
+	newTaskInput.classList.add("new-task-input");
+	newTaskInput.type = "text";
+	newTaskInput.placeholder = "Nova tarefa";
+	newTaskInput.addEventListener("keypress", e => board.handleNewTaskInputKeypress(e));
+	boardContainer.appendChild(newTaskInput);
+
+	return boardContainer;
+}
 
 function renderizarBoards(boards) {
 	const boardsContainer = document.querySelector(".boards");
